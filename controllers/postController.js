@@ -7,7 +7,7 @@ const Comment = require('../models/Comment');
 
 exports.index = async (req, res, next) => {
   try {
-    const posts = await Post.find({}).exec();
+    const posts = await Post.find({}).populate('author','username').exec();
     res.send(posts);
   } catch (err) {
     next(err);
@@ -30,15 +30,16 @@ exports.create_post = [
       return;
     }
     try {
+        const user = await User.findOne({user:req.user.username});
       const post = new Post({
         title: req.body.title,
         content: req.body.content,
         date: new Date(),
-        // author: req.user,
+        author: user,
         published: true,
       });
       await post.save();
-    //   console.log(JSON.parse(req.user));
+      console.log(user);
       res.redirect('/api');
     } catch (err) {
       res.status(403).send(err);
