@@ -6,4 +6,6 @@ router.get('/',post_controller.index);
 
 router.post('/signup',auth_controller.signup );
 
+router.post('/login',auth_controller.login);
+
 module.exports = router;

@@ -4,9 +4,12 @@ const path = require('path');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const bcryptjs = require('mongoose');
+const JWTstrategy = require('passport-jwt').Strategy;
+const ExtractJWT = require('passport-jwt').ExtractJwt;
+const bcryptjs = require('bcryptjs');
 const apiRouter = require('./routes/api');
 const cors = require('cors');
+const User = require('./models/User');
 require('dotenv').config();
 
 const app = express();
@@ -19,7 +22,72 @@ db.on('error', console.error.bind(console, 'mongo connection error'));
 
 app.use(express.json());
 app.use(cors());
+
+
+
+app.use(session({secret: process.env.SECRET, resave:false, saveUninitialized: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use('/api', apiRouter);
+
+
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        console.log(user);
+        return done(null, false, { message: 'User not found'});
+      }
+      else{
+      bcryptjs.compare(password, user.password, (err, res) => {
+        if (res) {
+          return done(null, user);
+        } else {
+          return done(null, false, { message: 'Incorrect password' });
+        }
+      });
+    }
+    } catch (err) {
+      return done(err,false);
+    }
+  })
+);
+
+
+
+
+
+passport.use(
+  new JWTstrategy(
+    {
+      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.SECRET,
+    },
+    (jwtPayload, done) => {
+      return done(null, jwtPayload);
+    }
+  )
+);
+
+
+
+passport.serializeUser(function (user, done) {
+  console.log('working');
+  done(null, user.id);
+});
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
+
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on ${process.env.PORT}`);
