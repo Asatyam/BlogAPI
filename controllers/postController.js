@@ -15,3 +15,7 @@ exports.index = async(req,res,next)=>{
         next(err);
     }
 }
+
+exports.get_posts = async(req,res,next)=>{
+    res.redirect('/api');
+}

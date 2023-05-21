@@ -95,3 +95,12 @@ exports.login =  async (req, res, next) => {
   res.status(403).json({err});
 }
 };
+
+exports.logout = async(req,res,next)=>{
+  req.logout(function(err){
+    if(err){
+      return next(err);
+    }
+    res.redirect('/api');
+  });
+};
