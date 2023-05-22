@@ -20,14 +20,20 @@ exports.create_comment = [
 
     async(req,res,next)=>{
         try{
-            const comment = new Comment({
-                content: req.body.content,
-                author: req.user.user,
-                post: req.params.postid,
-                date: (new Date())
-            });
-            await comment.save();
-            res.status(200).send({message: "comment added"});
+            const post = await Post.findOne({_id: req.params.postid}).exec();
+            if(post)
+            {
+                  const comment = new Comment({
+                    content: req.body.content,
+                    author: req.user.user,
+                    post: req.params.postid,
+                    date: new Date(),
+                  });
+                  await comment.save();
+                  res.status(200).send({ message: 'comment added' });
+            }else{
+                res.status(404).send({message: "Post not found"});
+            }
         }catch(err){
             res.send({message: "Some error occured"});
             return next(err);
@@ -36,8 +42,11 @@ exports.create_comment = [
 ]
 exports.delete_comment = async(req,res,next)=>{
     try{
-        const comment = await Comment.findOne({_id: req.params.commentid}).exec();
-        if(!comment){
+        const [comment,post] = await Promise.all([
+            Comment.findOne({_id: req.params.commentid}).exec(),
+            Post.findOne({_id: req.params.postid}).exec()
+        ])
+        if(!comment || !post ){
             res.status(404).send({message: "Comment not found"});
             return next(err);
         }else{
@@ -49,4 +58,30 @@ exports.delete_comment = async(req,res,next)=>{
         return next(err);
     }
 }
+exports.update_comment = [
+  body('content', 'comment cannot be empty').trim().notEmpty(),
+
+  async (req, res, next) => {
+    try {
+        const [theComment,post] = await Promise.all([
+             Comment.findOne({_id:req.params.commentid}).exec(),
+             Post.findOne({_id:req.params.postid}).exec(),
+        ])
+        if(!theComment || !post){
+            res.status(404).send({message:"Comment not found"});
+        }
+
+      const comment = {
+        content: req.body.content,
+        author: req.user.user,
+        post: req.params.postid,
+        date: new Date(),
+      };
+      await Comment.findByIdAndUpdate({_id:req.params.commentid},comment);
+      res.status(200).send({ message: 'comment updated' ,comment});
+    } catch (err) {
+      return next(err);
+    }
+  },
+];
 

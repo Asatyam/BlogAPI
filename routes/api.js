@@ -43,14 +43,23 @@ router.get(
 );
 
 router.post(
-  '/posts/:postid/comment',
+  '/posts/:postid/comments',
   passport.authenticate('jwt', { session: false }),
   comment_controller.create_comment
 );
 
 router.delete(
-  '/posts/:postid/comment/:commentid',
-  passport.authenticate('jwt',{session:false}),
-  comment_controller.delete_comment,
-)
+  '/posts/:postid/comments/:commentid',
+  passport.authenticate('jwt', { session: false }),
+  comment_controller.delete_comment
+);
+
+router.put(
+  '/posts/:postid/comments/:commentid',
+  passport.authenticate('jwt', { session: false }),
+  comment_controller.update_comment
+);
+router.get('/posts', async (req, res, next) => {
+  res.redirect('/api');
+});
 module.exports = router;
