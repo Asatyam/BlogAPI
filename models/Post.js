@@ -8,11 +8,6 @@ const PostSchema = new Schema({
   content: { type: String, required: true },
   date: { type: Date, default: new Date().toLocaleDateString() },
   published: { type: Boolean, default: true },
-  comments: [{
-    content: { type: String, required: true },
-    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    date: { type: Date, default: new Date().toLocaleDateString() },
-  }],
 });
 
 module.exports = mongoose.model('Post', PostSchema);

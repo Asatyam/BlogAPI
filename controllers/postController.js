@@ -49,8 +49,9 @@ exports.post_detail = async (req, res, next) => {
   try {
     const [thePost, allComments] = await Promise.all([
       Post.findById({ _id: req.params.postid })
-        .populate('author', { username: 1, _id: 0, comments: 1 })
+        .populate('author', { username: 1, _id: 0 })
         .exec(),
+      Comment.find({post: req.params.postid})
     ]);
     if (thePost) {
       res.send({ post: thePost, comments: allComments });
