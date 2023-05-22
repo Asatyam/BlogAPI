@@ -51,7 +51,7 @@ exports.post_detail = async (req, res, next) => {
       Post.findById({ _id: req.params.postid })
         .populate('author', { username: 1, _id: 0 })
         .exec(),
-      Comment.find({post: req.params.postid})
+      Comment.find({ post: req.params.postid }),
     ]);
     if (thePost) {
       res.send({ post: thePost, comments: allComments });
@@ -94,16 +94,15 @@ exports.update_post = [
       return;
     }
     try {
-     
-      const post = new Post({
+      const post = {
         title: req.body.title,
         content: req.body.content,
         date: new Date(),
         author: req.user.user,
         published: true,
-        _id: req.params.postid,
-      });
-      await post.save();
+      };
+      console.log(req.user.user);
+      await Post.findOneAndUpdate({ _id: req.params.postid }, post);
       res.send({ message: 'Updation successful' });
     } catch (err) {
       res.status(403).send(err);
