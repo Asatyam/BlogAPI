@@ -8,7 +8,7 @@ const Comment = require('../models/Comment');
 exports.index = async (req, res, next) => {
   try {
     const posts = await Post.find({}).populate('author', 'username').exec();
-    res.send(posts);
+    res.json(posts);
   } catch (err) {
     next(err);
   }

@@ -14,7 +14,6 @@ router.get('/logout', auth_controller.logout);
 
 router.get(
   '/posts/:postid',
-  passport.authenticate('jwt', { session: false }),
   post_controller.post_detail
 );
 
@@ -38,7 +37,6 @@ router.put(
 
 router.get(
   '/posts/:postid/comments',
-  passport.authenticate('jwt', { session: false }),
   comment_controller.get_comments
 );
 
