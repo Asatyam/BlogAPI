@@ -34,4 +34,19 @@ exports.create_comment = [
         }
     }
 ]
+exports.delete_comment = async(req,res,next)=>{
+    try{
+        const comment = await Comment.findOne({_id: req.params.commentid}).exec();
+        if(!comment){
+            res.status(404).send({message: "Comment not found"});
+            return next(err);
+        }else{
+            await Comment.findByIdAndDelete({_id: comment._id}).exec();
+            res.status(200).send({message: "Comment deleted"});
+        }
+    }catch(err){
+        res.status(404).send({message:"some error occured"});
+        return next(err);
+    }
+}
 
