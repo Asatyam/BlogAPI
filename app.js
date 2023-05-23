@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const session = require('express-session');
+const cookie = require('cookie-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
@@ -25,7 +26,7 @@ app.use(cors());
 
 
 
-app.use(session({secret: process.env.SECRET, resave:false, saveUninitialized: true}));
+app.use(cookie({secret: process.env.SECRET, resave:false, saveUninitialized: true}));
 app.use(passport.initialize());
 app.use(passport.session());
 
