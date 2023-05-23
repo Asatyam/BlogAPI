@@ -8,7 +8,7 @@ const Comment = require('../models/Comment');
 
 exports.get_comments = async(req,res,next)=>{
 
-    const comments = await Comment.find({post: req.params.postid}).populate('author').exec();
+    const comments = await Comment.find({post: req.params.postid}).populate('owner').exec();
     if(comments.length>0){
         res.send(comments);
     }else{
@@ -25,7 +25,7 @@ exports.create_comment = [
             {
                   const comment = new Comment({
                     content: req.body.content,
-                    author: req.user.user,
+                    author: req.body.username,
                     post: req.params.postid,
                     date: new Date(),
                   });
@@ -73,7 +73,7 @@ exports.update_comment = [
 
       const comment = {
         content: req.body.content,
-        author: req.user.user,
+        author: req.body.username,
         post: req.params.postid,
         date: new Date(),
       };
