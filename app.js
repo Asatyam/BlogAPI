@@ -26,7 +26,7 @@ app.use(cors());
 
 
 
-app.use(cookie({secret: process.env.SECRET, resave:false, saveUninitialized: true}));
+app.use(session({secret: process.env.SECRET, resave:false, saveUninitialized: true}));
 app.use(passport.initialize());
 app.use(passport.session());
 
