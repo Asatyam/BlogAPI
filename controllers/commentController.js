@@ -8,7 +8,7 @@ const Comment = require('../models/Comment');
 
 exports.get_comments = async(req,res,next)=>{
 
-    const comments = await Comment.find({post: req.params.postid}).populate('owner').exec();
+    const comments = await Comment.find({post: req.params.postid}).populate('owner').sort({date:-1}).exec();
     if(comments.length>0){
         res.send(comments);
     }else{
