@@ -21,55 +21,42 @@ mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongo connection error'));
 
-let corsOptions = {
-  origin: [
-    'https://blog-cms-asatyam.vercel.app/',
-    'https://blog-client-nu.vercel.app/',
-    'http://localhost:3000',
-  ],
-  optionsSuccessStatus: 200,
-};
-
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 
-
-
-app.use(session({secret: process.env.SECRET, resave:false, saveUninitialized: true}));
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.use('/api', apiRouter);
-app.use('/api', cors(corsOptions), apiRouter);
-
+app.use('/api', cors(), apiRouter);
 
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
-      
       const user = await User.findOne({ username: username });
       if (!user) {
-        return done(null, false, { message: 'User not found'});
+        return done(null, false, { message: 'User not found' });
+      } else {
+        bcryptjs.compare(password, user.password, (err, res) => {
+          if (res) {
+            return done(null, user);
+          } else {
+            return done(null, false, { message: 'Incorrect password' });
+          }
+        });
       }
-      else{
-      bcryptjs.compare(password, user.password, (err, res) => {
-        if (res) {
-          return done(null, user);
-        } else {
-          return done(null, false, { message: 'Incorrect password' });
-        }
-      });
-    }
     } catch (err) {
-      return done(err,false);
+      return done(err, false);
     }
   })
 );
-
-
-
-
 
 passport.use(
   new JWTstrategy(
@@ -83,8 +70,6 @@ passport.use(
   )
 );
 
-
-
 passport.serializeUser(function (user, done) {
   console.log('working');
   done(null, user.id);
@@ -97,7 +82,6 @@ passport.deserializeUser(async function (id, done) {
     done(err);
   }
 });
-
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on ${process.env.PORT}`);
