@@ -41,6 +41,7 @@ app.use(passport.session());
 
 
 app.use('/api', apiRouter);
+app.use('/api', cors(corsOptions), apiRouter);
 
 
 passport.use(
