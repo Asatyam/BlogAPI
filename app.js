@@ -21,8 +21,17 @@ mongoose.connect(mongoDb, { useUnifiedTopology: true, useNewUrlParser: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongo connection error'));
 
+let corsOptions = {
+  origin: [
+    'https://blog-cms-asatyam.vercel.app/',
+    'https://blog-client-nu.vercel.app/',
+    'http://localhost:3000',
+  ],
+  optionsSuccessStatus: 200,
+};
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 
 
